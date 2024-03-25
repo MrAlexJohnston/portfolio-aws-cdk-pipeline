@@ -1,0 +1,12 @@
+[
+    {
+        "owner": "MrAlexJohnston",
+        "repo": "portfolio-aws-cdk-pipeline",
+        "branch": "main"
+    },
+    {
+        "owner": "MrAlexJohnston",
+        "repo": "portfolio-aws-cdk-vpc",
+        "branch": "main"
+    }
+]
