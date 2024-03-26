@@ -49,6 +49,7 @@ export class PortfolioAwsCdkPipelineStack extends Stack {
           phases: {
             build: {
               commands: [
+                'npm install',
                 'npx cdk deploy --require-approval never'
               ]
             }
@@ -114,7 +115,7 @@ export class PortfolioAwsCdkPipelineStack extends Stack {
                 actionName: 'Deploy',
                 type: CodeBuildActionType.BUILD,
                 project: codeDeployProject,
-                input: buildOutput,
+                input: sourceOutput,
                 outputs: [deployOutput]
               })
             ]
