@@ -50,7 +50,7 @@ export class PortfolioAwsCdkPipelineStack extends Stack {
             build: {
               commands: [
                 'npm install',
-                'npx cdk deploy'
+                'npx cdk deploy --require-approval never'
               ]
             }
           }
