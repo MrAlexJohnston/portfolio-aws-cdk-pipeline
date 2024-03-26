@@ -46,7 +46,7 @@ export class PortfolioAwsCdkPipelineStack extends Stack {
             build: {
               commands: [
                 'npm install',
-                'npx deploy'
+                'npx cdk deploy'
               ]
             }
           }
