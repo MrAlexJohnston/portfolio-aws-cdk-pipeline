@@ -1,4 +1,4 @@
-import { Stack, type StackProps, SecretValue } from 'aws-cdk-lib'
+import { Stack, type StackProps, SecretValue, Fn } from 'aws-cdk-lib'
 import { type Construct } from 'constructs'
 import { Artifact, Pipeline } from 'aws-cdk-lib/aws-codepipeline'
 import { PolicyStatement, Effect } from 'aws-cdk-lib/aws-iam'
@@ -66,7 +66,19 @@ export class PortfolioAwsCdkPipelineStack extends Stack {
         resources: [`arn:aws:ssm:${region}:${account}:parameter/cdk-bootstrap/hnb659fds/version`]
       })
 
+      const assumeRolePolicy = new PolicyStatement({
+        actions: ['sts:AssumeRole'],
+        effect: Effect.ALLOW,
+        resources: [`arn:aws:iam::${account}:role/*`],
+        conditions: {
+          'ForAnyValue:StringEquals': {
+            'iam:ResourceTag/aws-cdk:bootstrap-role': ['image-publishing', 'file-publishing', 'deploy']
+          }
+        }
+      })
+
       codeDeployProject.addToRolePolicy(ssmPolicyStatement)
+      codeDeployProject.addToRolePolicy(assumeRolePolicy)
 
       new Pipeline(this, pipelineName, {
         stages: [
