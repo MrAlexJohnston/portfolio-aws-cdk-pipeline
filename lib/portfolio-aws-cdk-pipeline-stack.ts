@@ -1,6 +1,7 @@
 import { Stack, type StackProps, SecretValue } from 'aws-cdk-lib'
 import { type Construct } from 'constructs'
 import { Artifact, Pipeline } from 'aws-cdk-lib/aws-codepipeline'
+import { PolicyStatement, Effect } from 'aws-cdk-lib/aws-iam'
 import { GitHubSourceAction, GitHubTrigger, CodeBuildAction, CodeBuildActionType } from 'aws-cdk-lib/aws-codepipeline-actions'
 import { BuildSpec, LinuxBuildImage, PipelineProject } from 'aws-cdk-lib/aws-codebuild'
 
@@ -17,6 +18,9 @@ const cdkRepos: RepoInfo[] = cdkReposData
 export class PortfolioAwsCdkPipelineStack extends Stack {
   constructor (scope: Construct, id: string, props?: StackProps) {
     super(scope, id, props)
+
+    const account = Stack.of(this).account
+    const region = Stack.of(this).region
 
     for (const { branch, repo, owner } of cdkRepos) {
       const pipelineName = restructureRepo(repo)
@@ -55,6 +59,14 @@ export class PortfolioAwsCdkPipelineStack extends Stack {
           buildImage: LinuxBuildImage.STANDARD_7_0
         }
       })
+
+      const ssmPolicyStatement = new PolicyStatement({
+        effect: Effect.ALLOW,
+        actions: ['ssm:GetParameter'],
+        resources: [`arn:aws:ssm:${region}:${account}:parameter/cdk-bootstrap/hnb659fds/version`]
+      })
+
+      codeDeployProject.addToRolePolicy(ssmPolicyStatement)
 
       new Pipeline(this, pipelineName, {
         stages: [
